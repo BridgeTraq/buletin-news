@@ -1,6 +1,7 @@
 import UserImage from "../images/user-dp.jpg"
 import { BsDot } from "react-icons/bs";
 import { LiaArrowRightSolid } from "react-icons/lia";
+import { useEffect, useState } from "react";
 
 function Header({ title, label }) {
     return (
@@ -23,29 +24,29 @@ function Story({ image, name }) {
     );
 }
 
-function Creator({ image, name, channel }) {
+function Creator({ image, name, source }) {
     return (
         <div className="flex justify-center items-center gap-x-3">
             <img src={image} alt="creator graphics" className="w-[60px] h-[60px] rounded-full object-cover" />
 
             <span className="inline-flex flex-col">
                 <span className="font-semibold text-xl">{name}</span>
-                <span className="accent text-[.8rem] font-semibold">{channel}</span>
+                <span className="accent text-[.8rem] font-semibold">{source}</span>
             </span>
         </div>
     );
 }
 
-function NewsCard({ newsImage, channel, channelImage, timePosted, title, summary, category, readTime }) {
+function NewsCard({ bannerImage, source, sourceImage, timePosted, title, summary, category, readTime }) {
     return (
         <div className="news-card flex flex-col gap-y-3">
-            <img src={newsImage} alt="news head graphics" className="rounded-[15px] h-[250px] w-full mb-1 object-cover" />
+            <img src={bannerImage} alt="news head graphics" className="rounded-[15px] h-[250px] w-full mb-1 object-cover" />
 
             <span className="inline-flex items-center gap-x-1">
                 <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
-                    <img src={channelImage} alt="channel graphics" className="w-full h-full object-cover" />
+                    <img src={sourceImage} alt="source graphics" className="w-full h-full object-cover" />
                 </span>
-                <span className="text-gray-500 text-sm">{channel}</span>
+                <span className="text-gray-500 text-sm">{source}</span>
                 <BsDot className="text-gray-500 text-sm" />
                 <span className="text-gray-500 text-sm">{timePosted}</span>
             </span>
@@ -53,7 +54,7 @@ function NewsCard({ newsImage, channel, channelImage, timePosted, title, summary
             <h2 className="text-xl">{title}</h2>
             {summary && <p className="text-gray-500">{summary}</p>}
 
-            <span className="inline-flex items-center gap-x-1">
+            <span className="inline-flex items-center gap-x-1 mt-auto">
                 <span className="accent font-semibold text-sm">{category}</span>
                 <BsDot className="text-gray-500 text-sm" />
                 <span className="text-gray-500 text-sm">{readTime}</span>
@@ -63,16 +64,17 @@ function NewsCard({ newsImage, channel, channelImage, timePosted, title, summary
     );
 }
 
-function NewsCardSmall({ newsImage, channel, channelImage, timePosted, title, category, readTime }) {
+function NewsCardSmall({ bannerImage, source, sourceImage, timePosted, title, category = "news", readTime = "few minutes" }) {
+
     return (
         <div className="news-card flex flex-col gap-y-3">
-            <img src={newsImage} alt="news head graphics" className="rounded-[15px] h-[150px] w-full mb-1 object-cover" />
+            <img src={bannerImage} alt="news head graphics" className="rounded-[15px] h-[150px] w-full mb-1 object-cover" />
 
             <span className="inline-flex items-center gap-x-1">
                 <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
-                    <img src={channelImage} alt="channel graphics" className="w-full h-full object-cover" />
+                    <img src={sourceImage} alt="source graphics" className="w-full h-full object-cover" />
                 </span>
-                <span className="text-gray-500 text-sm">{channel}</span>
+                <span className="text-gray-500 text-sm">{source}</span>
                 <BsDot className="text-gray-500 text-sm" />
                 <span className="text-gray-500 text-sm">{timePosted}</span>
             </span>
@@ -89,7 +91,326 @@ function NewsCardSmall({ newsImage, channel, channelImage, timePosted, title, ca
     );
 }
 
+function HeroIntro() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const query = "John Wick"
+        const encode = encodeURIComponent(query);
+        const url = `https://newsapi.org/v2/everything?q=${encode}&language=en&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a`
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+
+    const randomIndex = data.length > 1 ? Math.round(Math.random() * (data.length - 1)) : 0;
+    let article = data[randomIndex];
+    // let article = data[0] 3,14,2,81,51,98,66;
+    if (!(article)) return <p>Loading...</p>;
+    console.log(randomIndex);
+
+    const category = article.category || "news";
+    const readTime = article.readTime || "few mins";
+    console.log(article, "was here")
+    return (
+        <section className="grid grid-cols-2 gap-[4.5em] h-[400px]">
+            <div className="flex flex-col relative rounded-[15px] h-[400px] overflow-clip">
+                <img src={article.urlToImage} alt="banner" className="object-cover w-full h-full" />
+                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
+            </div>
+
+            <div className="flex flex-col gap-y-4 py-10 justify-center">
+                <span className="inline-flex items-center gap-x-2">
+                    <img src={article.urlToImage} alt="source logo" className="w-[40px] h-[40px] rounded-full object-cover" />
+                    <span className="text-gray-500 text-xl">{article.source.name}</span>
+                    <BsDot className="text-gray-500 text-lg mt-2" />
+                    <span className="text-gray-500 text-lg">{article.publishedAt}</span>
+                </span>
+
+                <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}>{article.title}</h2>
+                <p className="text-gray-500 text-justify">{article.description}</p>
+
+                <span className="inline-flex items-center gap-x-2">
+                    <span className="accent text-xl font-semibold" >{category}</span>
+                    <BsDot className="text-gray-500 text-lg mt-2" />
+                    <span className="text-gray-500 text-lg">{readTime}</span>
+                </span>
+            </div>
+        </section>
+
+    );
+}
+
+function LatestNews() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/top-headlines?category=entertainment&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 4; i++) {
+        news.push(data[i])
+    }
+
+    console.log(news[0])
+    return (
+        <>
+            {
+                news.map(article => {
+                    if (!(article)) return <p>Loading...</p>;
+
+                    return (
+                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "News"} readTime={article.readTime || "a few minute"} />
+                    );
+                })
+            }
+
+        </>
+    );
+}
+
+function BusinessNews() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/top-headlines?category=business&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 2; i++) {
+        news.push(data[i])
+    }
+
+    console.log(news[0])
+    return (
+        <>
+            {
+                news.map(article => {
+                    if (!(article)) return <p>Loading...</p>;
+
+                    return (
+                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "few mins"} readTime={article.readTime || "few mins"} />
+                    );
+                })
+            }
+
+        </>
+    );
+}
+
+function SportNews() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/top-headlines?category=sports&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 2; i++) {
+        news.push(data[i])
+    }
+
+    console.log(news[0])
+    return (
+        <>
+            {
+                news.map(article => {
+                    if (!(article)) return <p>Loading...</p>;
+
+                    return (
+                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "few mins"} readTime={article.readTime || "few mins"} />
+                    );
+                })
+            }
+
+        </>
+    );
+}
+
+
+function Stories() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 10; i++) {
+        news.push(data[i])
+    }
+
+    console.log(news[0])
+    return (
+        <>
+            {
+                news.map(article => {
+                    if (!(article)) return <p>Loading...</p>;
+
+                    return (
+                        <Story image={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} name={article.source.name} />
+                    );
+                })
+            }
+
+        </>
+    );
+}
+
+function MustReadNews() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/top-headlines?category=technology&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 4; i++) {
+        news.push(data[i]);
+        console.log("i pushed ", i, " times")
+    }
+
+    console.log(news[0], news[1], news[2], news[3]);
+    const item1 = news[0];
+    const item2 = news[1];
+    const item3 = news[2];
+    const item4 = news[3];
+
+
+    return (
+        <>
+            <NewsCard bannerImage={item1?.urlToImage} source={item1?.source.name} sourceImage={item1?.urlToImage} timePosted={item1?.publishedAt} title={item1?.title} summary={item1?.description} category={item1?.category || "News"} readTime={item1?.readTime || "few mins"} />
+            <div className="col-span-2 rounded-[15px] flex flex-col relative overflow-clip">
+                <img src={item2?.urlToImage} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
+                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
+                <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
+                    <span className="inline-flex items-center gap-x-1">
+                        <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
+                            <img src={item2?.urlToImage} alt="source graphics" className="w-full h-full object-cover" />
+                        </span>
+                        <span className="text-gray-400 text-sm">{item2?.source.name}</span>
+                        <BsDot className="text-gray-400 text-sm" />
+                        <span className="text-gray-400 text-sm">{item2?.publishedAt}</span>
+                    </span>
+
+
+                    <h2 className="text-2xl text-white">{item2?.title}</h2>
+                    <p className="text-gray-400">{item2?.description}</p>
+
+
+                    <span className="inline-flex items-center gap-x-1">
+                        <span className="text-gray-400 font-semibold text-sm">{item2?.category || "News"}</span>
+                        <BsDot className="text-gray-400 text-sm" />
+                        <span className="text-gray-400 text-sm">{item2?.readTime || "few mins"}</span>
+                    </span>
+                </div>
+            </div>
+
+            <div className="flex flex-col justify-between">
+                <NewsCardSmall bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
+                <NewsCardSmall bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
+            </div>
+
+        </>
+    );
+}
+
+
+function EditorsPick() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/top-headlines?language=en&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 5; i++) {
+        news.push(data[i]);
+        console.log("i pushed ", i, " times")
+    }
+
+    console.log(news[0], news[1], news[2], news[3]);
+    const item1 = news[0];
+    const item2 = news[1];
+    const item3 = news[2];
+    const item4 = news[3];
+    const item5 = news[4];
+
+    return (
+        <>
+            <div className="col-span-full h-[500px] rounded-[15px] flex flex-col relative overflow-clip">
+                <img src={item1?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
+                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
+                <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
+                    <span className="inline-flex items-center gap-x-1">
+                        <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
+                            <img src={item1?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} alt="source graphics" className="w-full h-full object-cover" />
+                        </span>
+                        <span className="text-gray-400 text-sm">{item1?.source?.name}</span>
+                        <BsDot className="text-gray-400 text-sm" />
+                        <span className="text-gray-400 text-sm">{item1?.publishedAt}</span>
+                    </span>
+
+                    <h2 className="text-2xl text-white">{item1?.title}</h2>
+                    <p className="text-gray-400">{item1?.summary}</p>
+
+                    <span className="inline-flex items-center gap-x-1">
+                        <span className="text-gray-400 font-semibold text-sm">{item1?.category || "News"}</span>
+                        <BsDot className="text-gray-400 text-sm" />
+                        <span className="text-gray-400 text-sm">{item1?.readTime || "few mins"}</span>
+                    </span>
+                </div>
+            </div>
+
+            <NewsCard bannerImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item2?.source?.name} sourceImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item2?.publishedAt} title={item2?.title} category={item2?.category || "News"} readTime={item2?.readTime || "few mins"} />
+            <NewsCard bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
+            <NewsCard bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
+            <NewsCard bannerImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item5?.source?.name} sourceImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item5?.publishedAt} title={item5?.title} category={item5?.category || "News"} readTime={item5?.readTime || "few mins"} />
+        </>
+    );
+}
+
 export default function Home() {
+
     return (
         <>
             <header className="bg-[#F5F5F5] rounded-[15px] py-10 text-center flex flex-col ">
@@ -97,39 +418,13 @@ export default function Home() {
                 <p className="mx-auto max-w-[700px] w-full font-semibold md:text-3xl" style={{ lineHeight: "45px" }}>Craft narratives ✍️ that ignites <span className="accent">inspiration</span>💡,<br /> <span className="accent">knowledge</span> 📕, and <span className="accent">entertainment</span> 🎬.</p>
             </header>
 
-            <section className="grid grid-cols-2 gap-[4.5em] h-[400px]">
-                <div className="flex flex-col relative rounded-[15px] h-[400px] overflow-clip">
-                    <img src={UserImage} alt="user" className="object-cover w-full h-full" />
-                    <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
-                </div>
-
-                <div className="flex flex-col gap-y-4 py-10 justify-center">
-                    <span className="inline-flex items-center gap-x-2">
-                        <img src={UserImage} alt="" className="w-[40px] h-[40px] rounded-full object-cover" />
-                        <span className="text-gray-500 text-xl">Netflix</span>
-                        <BsDot className="text-gray-500 text-lg mt-2" />
-                        <span className="text-gray-500 text-lg">12 minutes ago</span>
-                    </span>
-
-                    <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}>Where to Watch 'John Wick: Chapter 4'</h2>
-                    <p className="text-gray-500 text-justify">There's been no official announcement regarding John Wick: Chapter 4's streaming release. However, given it's a Lionsgate film, John Wick: Chapter 4 will eventually be released on Starz...</p>
-
-                    <span className="inline-flex items-center gap-x-2">
-                        <span className="accent text-xl font-semibold" >Movies</span>
-                        <BsDot className="text-gray-500 text-lg mt-2" />
-                        <span className="text-gray-500 text-lg">4 min read</span>
-                    </span>
-                </div>
-            </section>
+            <HeroIntro />
 
             <section class="latest-news flex flex-col gap-y-7">
                 <Header title={"Latest news"} label={"See all"} />
 
                 <div className="grid grid-cols-4 gap-x-5">
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} summary={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis."} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} summary={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis."} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} summary={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis."} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} summary={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis."} category={"War"} readTime={"4 min read"} />
+                    <LatestNews />
                 </div>
             </section>
 
@@ -137,16 +432,7 @@ export default function Home() {
                 <Header title={"Buletin Story"} label={"See all"} />
 
                 <div className="flex gap-x-6">
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
-                    <Story image={UserImage} name={"BBC"} />
+                    <Stories />
                 </div>
             </section>
 
@@ -154,37 +440,7 @@ export default function Home() {
                 <Header title={"Must Read"} label={"See all"} />
 
                 <div className="grid grid-cols-4  gap-x-5">
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} summary={"Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis."} category={"War"} readTime={"4 min read"} />
-                    <div className="col-span-2 rounded-[15px] flex flex-col relative overflow-clip">
-                        <img src={UserImage} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
-                        <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
-                        <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
-                            <span className="inline-flex items-center gap-x-1">
-                                <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
-                                    <img src={UserImage} alt="channel graphics" className="w-full h-full object-cover" />
-                                </span>
-                                <span className="text-gray-400 text-sm">TVC</span>
-                                <BsDot className="text-gray-400 text-sm" />
-                                <span className="text-gray-400 text-sm">10 Hours ago</span>
-                            </span>
-
-
-                            <h2 className="text-2xl text-white">Taylor swift don come again with her wahala</h2>
-                            <p className="text-gray-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis.</p>
-
-
-                            <span className="inline-flex items-center gap-x-1">
-                                <span className="text-gray-400 font-semibold text-sm">Entertainment</span>
-                                <BsDot className="text-gray-400 text-sm" />
-                                <span className="text-gray-400 text-sm">10 min read</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col justify-between">
-                        <NewsCardSmall newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} category={"War"} readTime={"4 min read"} />
-                        <NewsCardSmall newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world"} category={"War"} readTime={"4 min read"} />
-                    </div>
+                    <MustReadNews />
                 </div>
             </section>
 
@@ -192,34 +448,7 @@ export default function Home() {
                 <Header title={"Editor's Pick"} label={"See all"} />
 
                 <div className="grid grid-cols-4 gap-5">
-                    <div className="col-span-full h-[500px] rounded-[15px] flex flex-col relative overflow-clip">
-                        <img src={UserImage} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
-                        <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
-                        <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
-                            <span className="inline-flex items-center gap-x-1">
-                                <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
-                                    <img src={UserImage} alt="channel graphics" className="w-full h-full object-cover" />
-                                </span>
-                                <span className="text-gray-400 text-sm">TVC</span>
-                                <BsDot className="text-gray-400 text-sm" />
-                                <span className="text-gray-400 text-sm">10 Hours ago</span>
-                            </span>
-
-                            <h2 className="text-2xl text-white">All rumours and wahala of Iphone 16</h2>
-                            <p className="text-gray-400">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid libero atque nostrum iste quia delectus? Id laborum nihil quaerat inventore. Sunt at inventore fugit facere, id harum eaque dolorem debitis.</p>
-
-                            <span className="inline-flex items-center gap-x-1">
-                                <span className="text-gray-400 font-semibold text-sm">Entertainment</span>
-                                <BsDot className="text-gray-400 text-sm" />
-                                <span className="text-gray-400 text-sm">10 min read</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
+                    <EditorsPick />
                 </div>
 
             </section>
@@ -229,16 +458,14 @@ export default function Home() {
                     <div className="col-span-full">
                         <Header title={"Business"} />
                     </div>
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
+                    <BusinessNews />
                 </section>
 
                 <section class="grid grid-cols-2 gap-5">
                     <div className="col-span-full" >
                         <Header title={"Sport News"} />
                     </div>
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
-                    <NewsCard newsImage={UserImage} channel={"Formula"} channelImage={UserImage} timePosted={"12 mins ago"} title={"Hello world i am a software engineer"} category={"War"} readTime={"4 min read"} />
+                    <SportNews />
                 </section>
             </section>
 
@@ -248,10 +475,10 @@ export default function Home() {
 
 
                 <div className="flex gap-x-32">
-                    <Creator image={UserImage} name={"Jame Carl"} channel={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} channel={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} channel={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} channel={"ALJAZEERA"} />
+                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
+                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
+                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
+                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
                 </div>
             </section>
 
