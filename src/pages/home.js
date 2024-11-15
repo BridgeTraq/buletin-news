@@ -1,7 +1,8 @@
-import UserImage from "../images/user-dp.jpg"
+// import UserImage from "../images/user-dp.jpg"
 import { BsDot } from "react-icons/bs";
 import { LiaArrowRightSolid } from "react-icons/lia";
 import { useEffect, useState } from "react";
+import { textShrink, dateFix } from "../components/article-helper";
 
 function Header({ title, label }) {
     return (
@@ -48,11 +49,11 @@ function NewsCard({ bannerImage, source, sourceImage, timePosted, title, summary
                 </span>
                 <span className="text-gray-500 text-sm">{source}</span>
                 <BsDot className="text-gray-500 text-sm" />
-                <span className="text-gray-500 text-sm">{timePosted}</span>
+                <span className="text-gray-500 text-sm">{dateFix(timePosted)}</span>
             </span>
 
-            <h2 className="text-xl">{title}</h2>
-            {summary && <p className="text-gray-500">{summary}</p>}
+            <h2 className="text-xl">{textShrink(title, 8)}</h2>
+            {summary && <p className="text-gray-500">{textShrink(summary, 20)}</p>}
 
             <span className="inline-flex items-center gap-x-1 mt-auto">
                 <span className="accent font-semibold text-sm">{category}</span>
@@ -76,10 +77,10 @@ function NewsCardSmall({ bannerImage, source, sourceImage, timePosted, title, ca
                 </span>
                 <span className="text-gray-500 text-sm">{source}</span>
                 <BsDot className="text-gray-500 text-sm" />
-                <span className="text-gray-500 text-sm">{timePosted}</span>
+                <span className="text-gray-500 text-sm">{dateFix(timePosted)}</span>
             </span>
 
-            <h2 className="text-xl">{title}</h2>
+            <h2 className="text-xl">{textShrink(title, 8)}</h2>
 
             <span className="inline-flex items-center gap-x-1">
                 <span className="accent font-semibold text-sm">{category}</span>
@@ -97,7 +98,7 @@ function HeroIntro() {
     useEffect(() => {
         const query = "John Wick"
         const encode = encodeURIComponent(query);
-        const url = `https://newsapi.org/v2/everything?q=${encode}&language=en&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a`
+        const url = `https://newsapi.org/v2/everything?q=${encode}&language=en&apiKey=d4fe481f8155432fb0f87102c3885975`
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -109,28 +110,28 @@ function HeroIntro() {
     let article = data[randomIndex];
     // let article = data[0] 3,14,2,81,51,98,66;
     if (!(article)) return <p>Loading...</p>;
-    console.log(randomIndex);
+    // console.log(randomIndex);
 
-    const category = article.category || "news";
-    const readTime = article.readTime || "few mins";
-    console.log(article, "was here")
+    const category = article?.category || "News";
+    const readTime = article?.readTime || "few mins";
+    // console.log(article, "was here")
     return (
-        <section className="grid grid-cols-2 gap-[4.5em] h-[400px]">
-            <div className="flex flex-col relative rounded-[15px] h-[400px] overflow-clip">
-                <img src={article.urlToImage} alt="banner" className="object-cover w-full h-full" />
+        <section className="grid grid-cols-2 gap-[4.5em] h-min-[400px]">
+            <div className="flex flex-col relative rounded-[15px] h-min-[400px] h-[full] overflow-clip">
+                <img src={article?.urlToImage} alt="banner" className="object-cover w-full h-full" />
                 <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
             </div>
 
             <div className="flex flex-col gap-y-4 py-10 justify-center">
                 <span className="inline-flex items-center gap-x-2">
-                    <img src={article.urlToImage} alt="source logo" className="w-[40px] h-[40px] rounded-full object-cover" />
-                    <span className="text-gray-500 text-xl">{article.source.name}</span>
+                    <img src={article?.urlToImage} alt="source logo" className="w-[40px] h-[40px] rounded-full object-cover" />
+                    <span className="text-gray-500 text-xl">{article?.source?.name}</span>
                     <BsDot className="text-gray-500 text-lg mt-2" />
-                    <span className="text-gray-500 text-lg">{article.publishedAt}</span>
+                    <span className="text-gray-500 text-lg">{dateFix(article?.publishedAt)}</span>
                 </span>
 
-                <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}>{article.title}</h2>
-                <p className="text-gray-500 text-justify">{article.description}</p>
+                <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}>{textShrink(article?.title, 8)}</h2>
+                <p className="text-gray-500 text-justify">{article?.description}</p>
 
                 <span className="inline-flex items-center gap-x-2">
                     <span className="accent text-xl font-semibold" >{category}</span>
@@ -143,11 +144,12 @@ function HeroIntro() {
     );
 }
 
+
 function LatestNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=entertainment&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/top-headlines?category=entertainment&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -161,7 +163,7 @@ function LatestNews() {
         news.push(data[i])
     }
 
-    console.log(news[0])
+    // console.log(news[0])
     return (
         <>
             {
@@ -169,7 +171,7 @@ function LatestNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "News"} readTime={article.readTime || "a few minute"} />
+                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "News"} readTime={article?.readTime || "a few minute"} />
                     );
                 })
             }
@@ -182,7 +184,7 @@ function BusinessNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=business&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/top-headlines?category=business&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -196,7 +198,7 @@ function BusinessNews() {
         news.push(data[i])
     }
 
-    console.log(news[0])
+    // console.log(news[0])
     return (
         <>
             {
@@ -204,7 +206,7 @@ function BusinessNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "few mins"} readTime={article.readTime || "few mins"} />
+                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
                     );
                 })
             }
@@ -217,7 +219,7 @@ function SportNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=sports&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/top-headlines?category=sports&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -231,7 +233,7 @@ function SportNews() {
         news.push(data[i])
     }
 
-    console.log(news[0])
+    // console.log(news[0])
     return (
         <>
             {
@@ -239,7 +241,7 @@ function SportNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article.source.name} sourceImage={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article.publishedAt} title={article.title} summary={article.description} category={article.category || "few mins"} readTime={article.readTime || "few mins"} />
+                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
                     );
                 })
             }
@@ -248,12 +250,11 @@ function SportNews() {
     );
 }
 
-
 function Stories() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -267,7 +268,7 @@ function Stories() {
         news.push(data[i])
     }
 
-    console.log(news[0])
+    // console.log(news[0])
     return (
         <>
             {
@@ -275,7 +276,7 @@ function Stories() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <Story image={article.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} name={article.source.name} />
+                        <Story image={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} name={article?.source?.name} />
                     );
                 })
             }
@@ -288,7 +289,7 @@ function MustReadNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=technology&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/top-headlines?category=technology&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -300,10 +301,10 @@ function MustReadNews() {
 
     for (let i = 0; i < 4; i++) {
         news.push(data[i]);
-        console.log("i pushed ", i, " times")
+        // console.log("i pushed ", i, " times")
     }
 
-    console.log(news[0], news[1], news[2], news[3]);
+    // console.log(news[0], news[1], news[2], news[3]);
     const item1 = news[0];
     const item2 = news[1];
     const item3 = news[2];
@@ -312,23 +313,23 @@ function MustReadNews() {
 
     return (
         <>
-            <NewsCard bannerImage={item1?.urlToImage} source={item1?.source.name} sourceImage={item1?.urlToImage} timePosted={item1?.publishedAt} title={item1?.title} summary={item1?.description} category={item1?.category || "News"} readTime={item1?.readTime || "few mins"} />
+            <NewsCard bannerImage={item1?.urlToImage} source={item1?.source?.name} sourceImage={item1?.urlToImage} timePosted={item1?.publishedAt} title={item1?.title} summary={item1?.description} category={item1?.category || "News"} readTime={item1?.readTime || "few mins"} />
             <div className="col-span-2 rounded-[15px] flex flex-col relative overflow-clip">
                 <img src={item2?.urlToImage} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
-                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
+                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.65)0% 25%, rgba(0,0, 0, 0.01))" }}></div>
                 <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
                     <span className="inline-flex items-center gap-x-1">
                         <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
                             <img src={item2?.urlToImage} alt="source graphics" className="w-full h-full object-cover" />
                         </span>
-                        <span className="text-gray-400 text-sm">{item2?.source.name}</span>
+                        <span className="text-gray-400 text-sm">{item2?.source?.name}</span>
                         <BsDot className="text-gray-400 text-sm" />
-                        <span className="text-gray-400 text-sm">{item2?.publishedAt}</span>
+                        <span className="text-gray-400 text-sm">{dateFix(item2?.publishedAt)}</span>
                     </span>
 
 
-                    <h2 className="text-2xl text-white">{item2?.title}</h2>
-                    <p className="text-gray-400">{item2?.description}</p>
+                    <h2 className="text-2xl text-white">{textShrink(item2?.title, 8)}</h2>
+                    <p className="text-gray-400">{textShrink(item2?.description, 20)}</p>
 
 
                     <span className="inline-flex items-center gap-x-1">
@@ -340,8 +341,8 @@ function MustReadNews() {
             </div>
 
             <div className="flex flex-col justify-between">
-                <NewsCardSmall bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
-                <NewsCardSmall bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
+                <NewsCardSmall bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
+                <NewsCardSmall bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
             </div>
 
         </>
@@ -353,7 +354,7 @@ function EditorsPick() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?language=en&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
+        const url = "https://newsapi.org/v2/top-headlines?q=news&apiKey=d4fe481f8155432fb0f87102c3885975";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -365,21 +366,22 @@ function EditorsPick() {
 
     for (let i = 0; i < 5; i++) {
         news.push(data[i]);
-        console.log("i pushed ", i, " times")
     }
 
-    console.log(news[0], news[1], news[2], news[3]);
+    // console.log(news[0], news[1], news[2], news[3]);
     const item1 = news[0];
     const item2 = news[1];
     const item3 = news[2];
     const item4 = news[3];
     const item5 = news[4];
 
+    // console.log(item1)
+
     return (
         <>
             <div className="col-span-full h-[500px] rounded-[15px] flex flex-col relative overflow-clip">
                 <img src={item1?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
-                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.3)0% 35%, rgba(0,0, 0, 0.01))" }}></div>
+                <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.65) 25%, rgba(0,0, 0, 0.01))" }}></div>
                 <div className="z-[1] mt-auto px-8 py-7 flex flex-col gap-y-4">
                     <span className="inline-flex items-center gap-x-1">
                         <span className="flex items-center justify-center border w-[20px] h-[20px] rounded-full overflow-clip">
@@ -387,11 +389,11 @@ function EditorsPick() {
                         </span>
                         <span className="text-gray-400 text-sm">{item1?.source?.name}</span>
                         <BsDot className="text-gray-400 text-sm" />
-                        <span className="text-gray-400 text-sm">{item1?.publishedAt}</span>
+                        <span className="text-gray-400 text-sm">{dateFix(item1?.publishedAt)}</span>
                     </span>
 
-                    <h2 className="text-2xl text-white">{item1?.title}</h2>
-                    <p className="text-gray-400">{item1?.summary}</p>
+                    <h2 className="text-2xl text-white">{textShrink(item1?.title, 15)}</h2>
+                    <p className="text-gray-400">{textShrink(item1?.description, 50)}</p>
 
                     <span className="inline-flex items-center gap-x-1">
                         <span className="text-gray-400 font-semibold text-sm">{item1?.category || "News"}</span>
@@ -405,6 +407,41 @@ function EditorsPick() {
             <NewsCard bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
             <NewsCard bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
             <NewsCard bannerImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item5?.source?.name} sourceImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item5?.publishedAt} title={item5?.title} category={item5?.category || "News"} readTime={item5?.readTime || "few mins"} />
+        </>
+    );
+}
+
+function Creators() {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=d4fe481f8155432fb0f87102c3885975";
+        fetch(url)
+            .then(response => response.json())
+            .then(data => { setData(data.articles); })
+            .catch(error => console.error(error))
+    }, []);
+
+    const news = [];
+    if (!(data)) return <p>Loading...</p>;
+
+    for (let i = 0; i < 4; i++) {
+        news.push(data[i])
+    }
+
+    // console.log(news[0])
+    return (
+        <>
+            {
+                news.map(article => {
+                    if (!(article)) return <p>Loading...</p>;
+
+                    return (
+                        <Creator image={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} name={article?.source?.name} source={article?.source?.name} />
+                    );
+                })
+            }
+
         </>
     );
 }
@@ -431,7 +468,7 @@ export default function Home() {
             <section class="latest-news flex flex-col gap-y-9">
                 <Header title={"Buletin Story"} label={"See all"} />
 
-                <div className="flex gap-x-6">
+                <div className="flex gap-x-6 ">
                     <Stories />
                 </div>
             </section>
@@ -475,10 +512,7 @@ export default function Home() {
 
 
                 <div className="flex gap-x-32">
-                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
-                    <Creator image={UserImage} name={"Jame Carl"} source={"ALJAZEERA"} />
+                    <Creators />
                 </div>
             </section>
 
