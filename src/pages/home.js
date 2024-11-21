@@ -3,6 +3,7 @@ import { BsDot } from "react-icons/bs";
 import { LiaArrowRightSolid } from "react-icons/lia";
 import { useEffect, useState } from "react";
 import { textShrink, dateFix } from "../components/article-helper";
+import { Link } from "react-router-dom";
 
 function Header({ title, label }) {
     return (
@@ -38,7 +39,7 @@ function Creator({ image, name, source }) {
     );
 }
 
-function NewsCard({ bannerImage, source, sourceImage, timePosted, title, summary, category, readTime }) {
+function NewsCard({ bannerImage, source, sourceImage, url, timePosted, title, summary, category, readTime }) {
     return (
         <div className="news-card flex flex-col gap-y-3">
             <img src={bannerImage} alt="news head graphics" className="rounded-[15px] h-[250px] w-full mb-1 object-cover" />
@@ -52,8 +53,8 @@ function NewsCard({ bannerImage, source, sourceImage, timePosted, title, summary
                 <span className="text-gray-500 text-sm">{dateFix(timePosted)}</span>
             </span>
 
-            <h2 className="text-xl">{textShrink(title, 8)}</h2>
-            {summary && <p className="text-gray-500">{textShrink(summary, 20)}</p>}
+            <h2 className="text-xl"><Link to={url || "/"}>{textShrink(title, 8)}</Link></h2>
+            {summary && <p className="text-gray-500"><Link to={url || "/"}>{textShrink(summary, 20)}</Link></p>}
 
             <span className="inline-flex items-center gap-x-1 mt-auto">
                 <span className="accent font-semibold text-sm">{category}</span>
@@ -65,7 +66,7 @@ function NewsCard({ bannerImage, source, sourceImage, timePosted, title, summary
     );
 }
 
-function NewsCardSmall({ bannerImage, source, sourceImage, timePosted, title, category = "news", readTime = "few minutes" }) {
+function NewsCardSmall({ bannerImage, source, url, sourceImage, timePosted, title, category = "news", readTime = "few minutes" }) {
 
     return (
         <div className="news-card flex flex-col gap-y-3">
@@ -80,7 +81,7 @@ function NewsCardSmall({ bannerImage, source, sourceImage, timePosted, title, ca
                 <span className="text-gray-500 text-sm">{dateFix(timePosted)}</span>
             </span>
 
-            <h2 className="text-xl">{textShrink(title, 8)}</h2>
+            <h2 className="text-xl"><Link to={url || "/"}>{textShrink(title, 8)}</Link></h2>
 
             <span className="inline-flex items-center gap-x-1">
                 <span className="accent font-semibold text-sm">{category}</span>
@@ -98,7 +99,7 @@ function HeroIntro() {
     useEffect(() => {
         const query = "John Wick"
         const encode = encodeURIComponent(query);
-        const url = `https://newsapi.org/v2/everything?q=${encode}&language=en&apiKey=d4fe481f8155432fb0f87102c3885975`
+        const url = `https://newsapi.org/v2/everything?q=${encode}&language=en&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a`
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -130,8 +131,8 @@ function HeroIntro() {
                     <span className="text-gray-500 text-lg">{dateFix(article?.publishedAt)}</span>
                 </span>
 
-                <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}>{textShrink(article?.title, 8)}</h2>
-                <p className="text-gray-500 text-justify">{article?.description}</p>
+                <h2 className="text-5xl font-medium" style={{ lineHeight: "4.2rem" }}><Link to={article?.url || "/"}>{textShrink(article?.title, 8)}</Link></h2>
+                <p className="text-gray-500 text-justify"><Link to={article?.url || "/"}>{article?.description}</Link></p>
 
                 <span className="inline-flex items-center gap-x-2">
                     <span className="accent text-xl font-semibold" >{category}</span>
@@ -149,7 +150,7 @@ function LatestNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=entertainment&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/top-headlines?category=entertainment&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -171,7 +172,7 @@ function LatestNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "News"} readTime={article?.readTime || "a few minute"} />
+                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} url={article?.url} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "News"} readTime={article?.readTime || "few mins"} />
                     );
                 })
             }
@@ -184,7 +185,7 @@ function BusinessNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=business&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/top-headlines?category=business&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -206,7 +207,7 @@ function BusinessNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
+                        <NewsCard url={article?.url} bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
                     );
                 })
             }
@@ -219,7 +220,7 @@ function SportNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=sports&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/top-headlines?category=sports&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -241,7 +242,7 @@ function SportNews() {
                     if (!(article)) return <p>Loading...</p>;
 
                     return (
-                        <NewsCard bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
+                        <NewsCard url={article?.url} bannerImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={article?.source?.name} sourceImage={article?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={article?.publishedAt} title={article?.title} summary={article?.description} category={article?.category || "few mins"} readTime={article?.readTime || "few mins"} />
                     );
                 })
             }
@@ -254,7 +255,7 @@ function Stories() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -289,7 +290,7 @@ function MustReadNews() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?category=technology&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/top-headlines?category=technology&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -313,7 +314,7 @@ function MustReadNews() {
 
     return (
         <>
-            <NewsCard bannerImage={item1?.urlToImage} source={item1?.source?.name} sourceImage={item1?.urlToImage} timePosted={item1?.publishedAt} title={item1?.title} summary={item1?.description} category={item1?.category || "News"} readTime={item1?.readTime || "few mins"} />
+            <NewsCard url={item1?.url} bannerImage={item1?.urlToImage} source={item1?.source?.name} sourceImage={item1?.urlToImage} timePosted={item1?.publishedAt} title={item1?.title} summary={item1?.description} category={item1?.category || "News"} readTime={item1?.readTime || "few mins"} />
             <div className="col-span-2 rounded-[15px] flex flex-col relative overflow-clip">
                 <img src={item2?.urlToImage} alt="user" className="object-cover w-full h-full absolute left-0 t0p-0" />
                 <div className="absolute left-0 top-0 w-full h-full" style={{ backgroundImage: "linear-gradient(to top, rgba(0, 0, 0, 0.65)0% 25%, rgba(0,0, 0, 0.01))" }}></div>
@@ -328,8 +329,8 @@ function MustReadNews() {
                     </span>
 
 
-                    <h2 className="text-2xl text-white">{textShrink(item2?.title, 8)}</h2>
-                    <p className="text-gray-400">{textShrink(item2?.description, 20)}</p>
+                    <h2 className="text-2xl text-white"><Link to={item2?.url || "/"}>{textShrink(item2?.title, 8)}</Link></h2>
+                    <p className="text-gray-400"><Link to={item2?.url || "/"}>{textShrink(item2?.description, 20)}</Link></p>
 
 
                     <span className="inline-flex items-center gap-x-1">
@@ -341,8 +342,8 @@ function MustReadNews() {
             </div>
 
             <div className="flex flex-col justify-between">
-                <NewsCardSmall bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
-                <NewsCardSmall bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
+                <NewsCardSmall url={item3?.url} bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
+                <NewsCardSmall url={item4?.url} bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
             </div>
 
         </>
@@ -354,7 +355,7 @@ function EditorsPick() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/top-headlines?q=news&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/top-headlines?q=news&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
@@ -392,8 +393,8 @@ function EditorsPick() {
                         <span className="text-gray-400 text-sm">{dateFix(item1?.publishedAt)}</span>
                     </span>
 
-                    <h2 className="text-2xl text-white">{textShrink(item1?.title, 15)}</h2>
-                    <p className="text-gray-400">{textShrink(item1?.description, 50)}</p>
+                    <h2 className="text-2xl text-white"><Link to={item1.url || "/"}>{textShrink(item1?.title, 15)}</Link></h2>
+                    <p className="text-gray-400"><Link to={item1.url || "/"}>{textShrink(item1?.description, 50)}</Link></p>
 
                     <span className="inline-flex items-center gap-x-1">
                         <span className="text-gray-400 font-semibold text-sm">{item1?.category || "News"}</span>
@@ -403,10 +404,10 @@ function EditorsPick() {
                 </div>
             </div>
 
-            <NewsCard bannerImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item2?.source?.name} sourceImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item2?.publishedAt} title={item2?.title} category={item2?.category || "News"} readTime={item2?.readTime || "few mins"} />
-            <NewsCard bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
-            <NewsCard bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
-            <NewsCard bannerImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item5?.source?.name} sourceImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item5?.publishedAt} title={item5?.title} category={item5?.category || "News"} readTime={item5?.readTime || "few mins"} />
+            <NewsCard url={item2?.url} bannerImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item2?.source?.name} sourceImage={item2?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item2?.publishedAt} title={item2?.title} category={item2?.category || "News"} readTime={item2?.readTime || "few mins"} />
+            <NewsCard url={item3?.url} bannerImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item3?.source?.name} sourceImage={item3?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item3?.publishedAt} title={item3?.title} category={item3?.category || "News"} readTime={item3?.readTime || "few mins"} />
+            <NewsCard url={item4?.url} bannerImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item4?.source?.name} sourceImage={item4?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item4?.publishedAt} title={item4?.title} category={item4?.category || "News"} readTime={item4?.readTime || "few mins"} />
+            <NewsCard url={item5?.url} bannerImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} source={item5?.source?.name} sourceImage={item5?.urlToImage || "https://img.freepik.com/free-psd/3d-rendering-news-sales-background_23-2150732563.jpg?t=st=1731516246~exp=1731519846~hmac=de65ea5942eb0c44fc10a59b81ee734fdb7c17ecf2d24a2e83efbfa25b481656&w=740"} timePosted={item5?.publishedAt} title={item5?.title} category={item5?.category || "News"} readTime={item5?.readTime || "few mins"} />
         </>
     );
 }
@@ -415,7 +416,7 @@ function Creators() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=d4fe481f8155432fb0f87102c3885975";
+        const url = "https://newsapi.org/v2/everything?q=news&excludeDomains=yahoo.com&apiKey=ecb6cd52bcfd4ba09d609a6cfe231e4a";
         fetch(url)
             .then(response => response.json())
             .then(data => { setData(data.articles); })
