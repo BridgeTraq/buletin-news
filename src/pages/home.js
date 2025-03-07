@@ -376,6 +376,8 @@ function EditorsPick() {
     const item4 = news[3];
     const item5 = news[4];
 
+    if (!(item1)) return <p>Loading...</p>;
+
     // console.log(item1)
 
     return (
